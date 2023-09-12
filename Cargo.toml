@@ -1,8 +1,23 @@
-[package]
-name = "Rust"
-version = "0.1.0"
-edition = "2021"
+[package] # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+name   	= "asm4ahk"
+version	= "0.1.0"
+edition	= "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name      	= "asm4ahk_lib"
+path      	= "src/asm4ahk.lib.rs"
+crate-type	= ['lib',"cdylib"]
+
+[[bin]]
+name	= "asm4ahk_bin"
+path	= "src/asm4ahk.bin.rs"
 
 [dependencies]
+
+[profile.release]
+# opt        	for      	size
+strip        	= true   	# Auto strip symbols from the binary (included by default on Linux/macOS)
+opt-level    	= "z"    	# |3|     optimize for size
+lto          	= true   	# |false| Sets link-time optimization.
+codegen-units	= 1      	# |16|    reduce parallel code generation
+panic        	= "abort"	# |unwind| save ~20k w/o drop-on-panic cleanup and std::panic::catch_unwind
