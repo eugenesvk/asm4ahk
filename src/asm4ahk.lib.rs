@@ -1,3 +1,4 @@
+#![allow(unused_imports,unused_variables,unreachable_code)]
 // pub mod bar;
 
 // +++ can find
