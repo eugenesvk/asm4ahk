@@ -2,9 +2,7 @@
 // pub mod bar;
 
 // +++ can find
-pub fn add(left: usize, right: usize) -> usize {
-  left + right
-}
+pub fn add(left: usize, right: usize) -> usize { left + right }
   // asm4ahk_lib.s snippet
   //	.def 	_ZN11asm4ahk_lib3add17hd06d888a8d7bfb4bE;
   //	.scl 	2;
@@ -24,9 +22,7 @@ pub fn add(left: usize, right: usize) -> usize {
   // .Lfunc_end0:
 
 // --- can NOT find
-// #[no_mangle] pub extern "C" fn add(left: usize, right: usize) -> usize {
-//   left + right
-// }
+#[no_mangle] pub extern "C" fn add_ext(left: usize, right: usize) -> usize { left + right }
   // asm4ahk_lib.s snippet
   //	.def 	add;
   //	.scl 	2;
@@ -45,8 +41,4 @@ pub fn add(left: usize, right: usize) -> usize {
   // .Ltmp0:
   // .Lfunc_end0:
 
-
-
-// pub fn ret42() -> i32 {
-//   42
-// }
+#[no_mangle] pub extern "C" fn ret42_ext() -> i32 { 42 }
