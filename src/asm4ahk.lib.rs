@@ -1,5 +1,6 @@
 #![allow(unused_imports,unused_variables,unreachable_code)]
 // pub mod bar;
+pub mod str2ahk;
 
 // +++ can find
 pub fn add(left: usize, right: usize) -> usize { left + right }
