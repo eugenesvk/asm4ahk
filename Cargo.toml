@@ -13,7 +13,16 @@ name	= "asm4ahk_bin"
 path	= "src/asm4ahk.bin.rs"
 
 [dependencies]
-widestring = "1.0.2"
+fancy-regex	= "0.11.0"
+widestring 	= "1.0.2"
+
+[dependencies.windows]
+version 	= "0.48"
+features	= [
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Input_KeyboardAndMouse", # active window
+]
 
 [profile.release]
 # opt        	for      	size
