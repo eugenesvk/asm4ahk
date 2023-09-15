@@ -26,10 +26,10 @@ use widestring::{
 
 #[no_mangle] pub extern "system"
 fn post_message_to_ahk() -> *const WideChar {
-  let listed_all         	= U16CString::from_str("listed all, found none");
-  let found_or_failed    	= U16CString::from_str("found or failed"); // if cb_ return 0 to stop enumeration, EnumWindows also returns 0, which is the same as failed
-  let ptr_listed_all     	= listed_all.expect("Some null?").into_raw();
-  let ptr_found_or_failed	= found_or_failed.expect("Some null?").into_raw();
+  let listed_all         	= U16CString::from_str("listed all, found none").expect("Some null?");
+  let found_or_failed    	= U16CString::from_str("found or failed").expect("Some null?"); // if cb_ return 0 to stop enumeration, EnumWindows also returns 0, which is the same as failed
+  let ptr_listed_all     	= listed_all.into_raw();
+  let ptr_found_or_failed	= found_or_failed.into_raw();
   unsafe {
     match EnumWindows(    	  	// Enumerates all top-level windows on the screen by passing the handle to each window, in turn, to an application-defined callback function until the last top-level window is enumerated or the callback function returns FALSE learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumwindows
       Some(cb_enum_window)	, 	// WNDENUMPROC	pointer to an app-defined             callback function
