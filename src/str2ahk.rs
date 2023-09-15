@@ -1,3 +1,6 @@
+// potential alternative to into_raw: https://users.rust-lang.org/t/correct-way-to-implement-a-function-which-returns-a-c-string/315
+  // cs.as_ptr()  lifetime of pointer returned from CString ends as soon as cs goes out of scope
+
 /* use in AutoHotkey
 test_rust_dll()
 test_rust_dll() {
@@ -5,22 +8,27 @@ test_rust_dll() {
   testlib_return_s_self      	:= DllCall.Bind("asm4ahk_lib\return_s_self"      	, 'str',unset	, 'str')
   testlib_how_many_characters	:= DllCall.Bind("asm4ahk_lib\how_many_characters"	, 'str',unset	, 'uptr')
   testlib_return_s           	:= DllCall.Bind("asm4ahk_lib\return_s"           	             	, 'str')
-  testlib_return_as          	:= DllCall.Bind("asm4ahk_lib\return_as"          	             	, 'astr')
+  testlib_return_as          	:= DllCall.Bind("asm4ahk_lib\return_as"          	             	, 'Ptr')
+  testlib_return_as_ptr      	:= testlib_return_as()
+  testlib_return_as_str      	:= StrGet(got_ptr_res,,enc:='CP0')
+  ; free from AHK
+  testlib_dealloc_str_passed_to_ahk := DllCall.Bind('asm4ahk_lib\dealloc_str_passed_to_ahk', 'Ptr',unset)
   testlib_return_s_osw       	:= DllCall.Bind("asm4ahk_lib\return_s_osw"       	             	, 'str')
   testlib_return_s_modified  	:= DllCall.Bind("asm4ahk_lib\return_s_modified"  	, 'str',unset	, 'str')
   msgbox(''
    . '`n' testlib_return_s_self("inAHK")      	'`t' 'testlib_return_s_self'
    . '`n' testlib_how_many_characters("inAHK")	'`t' 'testlib_how_many_characters'
    . '`n' testlib_return_s()                  	'`t' 'testlib_return_s'
-   . '`n' testlib_return_as()                 	'`t' 'testlib_return_as'
+   . '`n' testlib_return_as_str()             	'`t' 'testlib_return_as_str'
    . '`n' testlib_return_s_osw()              	'`t' 'return_s_osw'
    . '`n' testlib_return_s_modified('inAHK')  	'`t' 'testlib_return_s_modified'
    )
+  testlib_dealloc_str_passed_to_ahk(got_ptr_res)
   DllCall("FreeLibrary", "Ptr",hModule)  ; To conserve memory, the DLL may be unloaded after use
 }
 */
 
-use std::ffi::{CStr,c_char,c_short,c_ushort};
+use std::ffi::{CString,CStr,c_char,c_short,c_ushort};
 use widestring::{
   U16Str,U16String,       	// U16String and U32String, on the other hand, are similar to (but not the same as), OsString, and are designed around working with FFI. Unlike the UTF variants, these strings do not have a defined encoding, and can work with any wide character strings, regardless of the encoding. They can be converted to and from OsString (but may require an encoding conversion depending on the platform), although that string type is an OS-specified encoding, so take special care.
   WideString ,WideChar,   	// alias for u16|u32 to match C wchar_t size (per platform)
@@ -29,13 +37,16 @@ use widestring::{
   Utf16Str   ,Utf16String,	// UTF-16 encoded, growable owned string
   u16str,u16cstr,utf16str 	// macros
 };
+// Notes
+  // bind CString to a var before calling .as_ptr
+    // pointer from as_ptr does not carry any lifetime information and the CString is deallocated immediately after the CString::new("New").expect("x").as_ptr() expression is evaluated
 
 // 1 No input, return generated string
 #[no_mangle] pub extern "C"
 fn return_s() -> *const WideChar { // alias to u16 on Windows
   // let w_str	= WideString::from(u16str! ("WideString::from(u16str !")); //WideString=U16String on Windows
-  let w_str   	= U16String  ::from(u16str!  ("U16String  ::from(u16str  !")); //WideString=U16String on Windows
   let w_cstr  	= U16CString ::from(u16cstr! ("U16CString ::from(u16cstr !"));
+  let w_str   	= U16String  ::from(u16str!  ("U16String  ::from(u16str  !")); //WideString=U16String on Windows
   let w_16str 	= Utf16String::from(utf16str!("Utf16String::from(utf16str!"));
 
   // w_cstr.as_ptr() // fails
@@ -52,11 +63,22 @@ fn return_s_osw() -> *const u16 {
     .collect::<Vec<_>>();
   os_str_w.as_ptr()
 }
-#[no_mangle] pub extern "C"
-fn return_as() -> *const c_char { // doesn't work even with AHK's 'astr' return
-  let c_err = std::ffi::CString::new("123").unwrap();
-  c_err.as_ptr()
+#[no_mangle] pub extern "system"
+fn return_as() -> *const c_char {
+  let c_string = CString::new("✗123").expect("CString::new failed");
+  c_string.as_ptr() // fails, AHK can't get thi string
+
+  // let ptr_c_string = c_string.into_raw(); // works, but leaks memory per https://doc.rust-lang.org/stable/std/ffi/struct.CString.html#method.into_raw
+    // testlib_post_message_to_ahk := DllCall.Bind('asm4ahk_lib\post_message_to_ahk', 'Ptr')
+    // got_ptr_res := testlib_post_message_to_ahk()
+    // got_str_res := StrGet(got_ptr_res,,enc:='CP0')
+  // free from AHK
+    // testlib_dealloc_str_passed_to_ahk := DllCall.Bind('asm4ahk_lib\dealloc_str_passed_to_ahk', 'Ptr',unset)
+    // testlib_dealloc_str_passed_to_ahk(got_ptr_res)
+  // ptr_c_string
 }
+#[no_mangle] pub extern "system"
+fn dealloc_str_passed_to_ahk(str_ptr:*mut i8) {unsafe{let _ = CString::from_raw(str_ptr);}}
 
 // 2 String input
 // 2.1 return self
@@ -99,7 +121,11 @@ fn return_s_modified(s: &WideChar) -> *const WideChar {
   // Append
   let borrowed_string: &str = "¦world¦";
   utf8_str.push_str(borrowed_string);
-  let ret_w16str = U16String::from_str(utf8_str.as_str());
-  // Return
-  ret_w16str.as_ptr() //works
+  let ret_w16cstr = U16CString::from_str(utf8_str.as_str()).expect("Some null lurking inside!");
+  // Return // call dealloc from AHK to avoid memory leak!
+  let ptr_c_string = ret_w16cstr.into_raw();
+  ptr_c_string
 }
+
+// can also use constants
+const MY_STR: &U16CStr = u16cstr!("A constant, nul-terminated UTF-16 string!");
