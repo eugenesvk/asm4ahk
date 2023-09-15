@@ -1,8 +1,10 @@
-#![allow(unused_imports,unused_variables,unreachable_code)]
+#![allow(unused_imports,unused_variables,unreachable_code,dead_code,non_upper_case_globals)]
 // pub mod bar;
 pub mod str2ahk;
+pub mod msg2ahk;
 
 // +++ can find
+pub fn ret42() -> i32 { 42 }
 pub fn add(left: usize, right: usize) -> usize { left + right }
   // asm4ahk_lib.s snippet
   //	.def 	_ZN11asm4ahk_lib3add17hd06d888a8d7bfb4bE;
