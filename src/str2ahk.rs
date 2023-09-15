@@ -11,7 +11,7 @@ test_rust_dll() {
   testlib_return_as          	:= DllCall.Bind("asm4ahk_lib\return_as"          	             	, 'Ptr')
   testlib_return_as_ptr      	:= testlib_return_as()
   if testlib_return_as_ptr := testlib_post_message_to_ahk() {
-    testlib_return_as_str	:= StrGet(got_ptr_res,,enc:='CP0')
+    testlib_return_as_str	:= StrGet(got_ptr_res,,enc:='CP0') ; or use utf-8 for return_s_utf8 or none for U16String
     testlib_dealloc_str_passed_to_ahk(got_ptr_res) ; string is copied ↑, so should be fine deallocating
   } else {
     testlib_return_as_str	:= ''
@@ -47,6 +47,14 @@ use widestring::{
     // pointer from as_ptr does not carry any lifetime information and the CString is deallocated immediately after the CString::new("New").expect("x").as_ptr() expression is evaluated
 
 // 1 No input, return generated string
+#[no_mangle] pub extern "system"
+fn return_s_utf8() -> *const c_char {
+  let str_utf8 = "✗123";
+  let c_string = CString::new(str_utf8).expect("CString::new failed");
+  let ptr_c_string	= c_string.into_raw();
+  ptr_c_string
+}
+
 #[no_mangle] pub extern "C"
 fn return_s() -> *const WideChar { // alias to u16 on Windows
   // let w_str	= WideString::from(u16str! ("WideString::from(u16str !")); //WideString=U16String on Windows
