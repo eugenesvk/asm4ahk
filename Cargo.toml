@@ -4,6 +4,9 @@ version	= "0.1.0"
 edition	= "2021"
 build  	= "build.rs"
 
+[workspace]
+members = ["helper"]	# relative to the workspace root
+
 [lib]
 name      	= "asm4ahk_lib"
 path      	= "src/asm4ahk.lib.rs"
