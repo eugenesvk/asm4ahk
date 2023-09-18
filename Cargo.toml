@@ -58,6 +58,10 @@ version 	= "0.48"
 features	= [
   "Win32_Globalization",
 ]
+
+[patch.crates-io]
+mmap-sync	= {git="https://github.com/eugenesvk/mmap-sync",branch="win"}
+
 [profile.release]
 # opt        	for      	size
 strip        	= true   	# Auto strip symbols from the binary (included by default on Linux/macOS)
