@@ -1,5 +1,10 @@
+#![allow(non_snake_case,non_upper_case_globals,non_camel_case_types,unused_imports,unused_mut,unused_variables,dead_code,unused_assignments,unused_macros)]
 // potential alternative to into_raw: https://users.rust-lang.org/t/correct-way-to-implement-a-function-which-returns-a-c-string/315
   // cs.as_ptr()  lifetime of pointer returned from CString ends as soon as cs goes out of scope
+// either return a string that requires an explicit deallocation call to return it back to Rust and dealloc there
+// OR write string to a passed argument buffer, but then the length of this buffer isn't known in advance, so
+  // either do 2 calls, one sets the length based on the result, 2nd writes the result (no better than calling dealloc, also a 2nd call)
+  // or set some known-in-advance max result length
 
 /* use in AutoHotkey
 test_rust_dll()
@@ -18,8 +23,8 @@ test_rust_dll() {
   }
   ; free from AHK
   testlib_dealloc_str_passed_to_ahk := DllCall.Bind('asm4ahk_lib\dealloc_str_passed_to_ahk', 'Ptr',unset)
-  testlib_return_s_osw       	:= DllCall.Bind("asm4ahk_lib\return_s_osw"       	             	, 'str')
-  testlib_return_s_modified  	:= DllCall.Bind("asm4ahk_lib\return_s_modified"  	, 'str',unset	, 'str')
+  testlib_return_s_osw     	:= DllCall.Bind("asm4ahk_lib\return_s_osw"     	             	, 'str')
+  testlib_return_s_modified	:= DllCall.Bind("asm4ahk_lib\return_s_modified"	, 'str',unset	, 'str')
   msgbox(''
    . '`n' testlib_return_s_self("inAHK")      	'`t' 'testlib_return_s_self'
    . '`n' testlib_how_many_characters("inAHK")	'`t' 'testlib_how_many_characters'
