@@ -145,3 +145,25 @@ fn return_s_modified(s: &WideChar) -> *const WideChar {
 
 // can also use constants
 const MY_STR: &U16CStr = u16cstr!("A constant, nul-terminated UTF-16 string!");
+
+
+use std::slice;
+#[no_mangle] pub extern "C"
+fn write_string_to_arg_buffer(pre:&WideChar,s:&WideChar, err_ptr:*mut u8) -> *const WideChar { // call dealloc from AHK to avoid memory leak!
+  let err_none 	= U16CString::from(u16cstr!("123"));
+  let err_utf16	= U16CString::from(u16cstr!("failed to convert to C string!"));
+  let header_size=2u32;
+  let err_msg = "abc";
+  let err_msg_cs = match CString::new(err_msg) {
+      Ok(cs) => cs,
+      Err(_) => return err_utf16.into_raw(),
+  };
+  let err_msg_b    	= err_msg_cs.as_bytes_with_nul();
+  let err_msg_bufer	= unsafe{slice::from_raw_parts_mut(err_ptr, header_size as usize)};
+  let max_buff_len 	= std::cmp::min(err_msg_b.len(),header_size as usize);
+  err_msg_bufer[..max_buff_len].copy_from_slice(&err_msg_b[..max_buff_len]);
+  // ↑ get via err_msg := StrGet(err_buff,,'UTF-8')
+
+  err_none.into_raw()
+}
+
