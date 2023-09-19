@@ -29,7 +29,7 @@ seahash      	= "4.1.0"
 thiserror    	= "1.0.48"
 memmap2      	= "0.7.1"
 mmap-sync    	= "1.0.1"
-aho-corasick 	= "1.0.5"
+aho-corasick 	= "1.1.0"
 chrono       	= "0.4.31"
 
 [dependencies.windows]
