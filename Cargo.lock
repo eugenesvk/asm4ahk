@@ -685,6 +685,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "653f141f39ec16bba3c5abe400a0c60da7468261cc2cbf36805022876bc721a8"
 
 [[package]]
+name = "win_api_const_mmap"
+version = "0.1.0"
+dependencies = [
+ "mmap-sync",
+ "rkyv",
+ "rkyv_wrappers",
+ "widestring",
+]
+
+[[package]]
 name = "windows"
 version = "0.48.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
