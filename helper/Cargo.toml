@@ -8,6 +8,3 @@ license    	= "MIT"
 [dependencies]
 # bitflags  	= "2.3.3"
 # proc_macro	= {path="../proc_macro"}
-indexmap    	= "2.0.0"
-aho-corasick 	= "1.0.5"
-chrono       	= "0.4.31"
