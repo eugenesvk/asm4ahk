@@ -4,7 +4,16 @@
 // either return a string that requires an explicit deallocation call to return it back to Rust and dealloc there
 // OR write string to a passed argument buffer, but then the length of this buffer isn't known in advance, so
   // either do 2 calls, one sets the length based on the result, 2nd writes the result (no better than calling dealloc, also a 2nd call)
-  // or set some known-in-advance max result length
+    unsafe extern "C" fn twostep_1size_2fill(buffer:mut c_char, buffer_len:c_int) -> c_int { // Writes string→buffer (caller provided), return # of bytes written
+      let some_string = "I'm made in Rust!";
+      if buffer.is_null()                     	{ return some_string.len() as c_int; // 1 return the buffer size so the caller knows how much memory to allocate
+      } else if buffer_len < some_string.len()	{ return ERR_INSUFFICIENT_BUFFER_SIZE; } // or can truncate as mmap function does for errors when it's not important to be wrong
+      let mut buffer = std::slice::from_raw_parts_mut(buffer as *mut u8, buffer_len); // 2 otherwise, do the actual copy
+      buffer.copy_from_slice(some_string.as_bytes());
+      some_string.len() as c_int
+    }
+  // OR set some known-in-advance max result length
+
 
 /* use in AutoHotkey
 test_rust_dll()
