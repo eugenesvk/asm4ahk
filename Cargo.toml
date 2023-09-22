@@ -69,3 +69,9 @@ opt-level    	= "z"    	# |3|     optimize for size
 lto          	= true   	# |false| Sets link-time optimization.
 codegen-units	= 1      	# |16|    reduce parallel code generation
 panic        	= "abort"	# |unwind| save ~20k w/o drop-on-panic cleanup and std::panic::catch_unwind
+
+[profile.dev.package."*"] # build dependencies in release mode to make the main app faster
+opt-level	= 3	# |3|     s=size, z=size+
+
+[profile.dev.build-override] # build scripts and proc-macros
+opt-level	= 3	# |3|     s=size, z=size+
