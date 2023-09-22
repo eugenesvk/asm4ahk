@@ -17,20 +17,15 @@ name	= "asm4ahk_bin"
 path	= "src/asm4ahk.bin.rs"
 
 [dependencies]
-helper       	= {path="helper"}
-fancy-regex  	= "0.11.0"
-widestring   	= "1.0.2"
-phf          	= {version="0.11",features=["macros"]}
-indexmap     	= "2.0.0"
-redb         	= "1.1.0"
-rkyv         	= {version="0.7.42",features=["validation"]}
-rkyv_wrappers	= {git="https://github.com/rkyv/rkyv_contrib",version="0.1.0"}
-seahash      	= "4.1.0"
-thiserror    	= "1.0.48"
-memmap2      	= "0.7.1"
-mmap-sync    	= "1.0.1"
-aho-corasick 	= "1.1.0"
-chrono       	= "0.4.31"
+helper      	= {path="helper"}
+fancy-regex 	= "0.11.0"
+widestring  	= "1.0.2"
+phf         	= {version="0.11",features=["macros"]}
+indexmap    	= "2.0.0"
+seahash     	= "4.1.0"
+thiserror   	= "1.0.48"
+aho-corasick	= "1.1.0"
+chrono      	= "0.4.31"
 
 [dependencies.windows]
 version 	= "0.48"
@@ -45,22 +40,14 @@ helper       	= {path="helper"}
 phf          	= {version="0.11.1",default-features=false} # generate Rust source for PHF data structures at compile time
 phf_codegen  	= "0.11.1"
 indexmap     	= "2.0.0"
-redb         	= "1.1.0"
-rkyv         	= {version="0.7.42",features=["validation"]}
-rkyv_wrappers	= {git="https://github.com/rkyv/rkyv_contrib",version="0.1.0"}
 seahash      	= "4.1.0"
 thiserror    	= "1.0.48"
-memmap2      	= "0.7.1"
-mmap-sync    	= "1.0.1"
 
 [build-dependencies.windows]
 version 	= "0.48"
 features	= [
   "Win32_Globalization",
 ]
-
-[patch.crates-io]
-mmap-sync	= {git="https://github.com/eugenesvk/mmap-sync",branch="win"}
 
 [profile.release]
 # opt        	for      	size
