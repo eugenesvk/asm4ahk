@@ -4,7 +4,6 @@ extern crate helper;
 use helper        	::*; // gets macros
 use helper::alias 	::*;
 use helper::helper	::*;
-use helper::parser	::*;
 
 fn main() {
 }
